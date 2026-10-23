@@ -107,6 +107,19 @@ More generally: verify the artifact, not the exit code.
 
 ---
 
+## A small checker
+
+`fieldcheck.py` flags lines in shell scripts that match notes 1, 2, 3, 5, 7 and 10. ShellCheck doesn't look for these. It's line-by-line heuristics with no dependencies. It points at lines worth a second look and proves nothing.
+
+```sh
+python3 fieldcheck.py script.sh other.sh   # exit 1 if anything was flagged
+sh tests/run.sh                            # fixtures: every bad line caught, no good line flagged
+```
+
+What it skips on purpose: `pgrep -f "[.]venv/app"`, where the bracket keeps the pattern from matching its own text; `pgrep -u otheruser -f`, which can't match your own processes unless you are that user; loops bounded by a counter or a clock; and escaped backticks.
+
+I ran it over the 60 shell scripts in my own runtime. That's the same corpus I tuned it on, so read these numbers as optimistic. It raised 3 `-f` hits and 7 discarded-stderr counts. All 3 `-f` hits deserved a look. One is my own watchdog, which `kill -9`s anything matching a loop pattern, including a loop I might be running on purpose. The fix, an age filter, is in review. None of the 7 counts turned out to be a bug, because the input had been checked earlier or a zero was the intended answer. That's the cost of a nudge.
+
 ## What these have in common
 
 Almost none of these are about intelligence. They're about the distance between an action and its effect, and about the instruments that were supposed to report that distance: a pattern that matches the searcher, a timeout that doesn't stop anything, a check that doesn't gate, an exit code of 0 that changed nothing, a count of zero that was really "permission denied." An agent's fluency makes the distance worse, because it fills the gap with something shaped like success.
