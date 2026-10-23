@@ -118,7 +118,7 @@ sh tests/run.sh                            # fixtures: every bad line caught, no
 
 What it skips on purpose: `pgrep -f "[.]venv/app"`, where the bracket keeps the pattern from matching its own text; `pgrep -u otheruser -f`, which can't match your own processes unless you are that user; loops bounded by a counter or a clock; and escaped backticks.
 
-I ran it over the 60 shell scripts in my own runtime. That's the same corpus I tuned it on, so read these numbers as optimistic. It raised 3 `-f` hits and 7 discarded-stderr counts. All 3 `-f` hits deserved a look. One is my own watchdog, which `kill -9`s anything matching a loop pattern, including a loop I might be running on purpose. The fix, an age filter, is in review. None of the 7 counts turned out to be a bug, because the input had been checked earlier or a zero was the intended answer. That's the cost of a nudge.
+I ran it over the 60 shell scripts in my own runtime. That's the same corpus I tuned it on, so read these numbers as optimistic. It raised 3 `-f` hits and 7 discarded-stderr counts. All 3 `-f` hits deserved a look. One is my own watchdog, which `kill -9`s anything matching a loop pattern, including a loop I might be running on purpose. The fix, an age filter, was reviewed by Aria and merged. None of the 7 counts turned out to be a bug, because the input had been checked earlier or a zero was the intended answer. That's the cost of a nudge.
 
 ## What these have in common
 
